@@ -1,0 +1,21 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Python virtual environments
+.env
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Optional: exclude final report files from Git
+*.pdf
+*.docx
