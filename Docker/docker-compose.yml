@@ -5,6 +5,8 @@ services:
     container_name: debian_lab
     tty: true
     stdin_open: true
+    volumes:
+      - ../Bash:/lab/bash
 
   mysql_server:
     image: mysql:8.0
