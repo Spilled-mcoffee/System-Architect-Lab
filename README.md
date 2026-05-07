@@ -27,7 +27,7 @@ The project is divided into three main technical parts:
 ## Repository Structure
 
 ```text
-expose system/
+System-Architect-Lab/
 ├── Docker/
 │   └── docker-compose.yml
 ├── bash/
