@@ -1,278 +1,302 @@
 # System Architect Lab
 
-This repository contains the deliverables for the **System Architect Lab** mini-project in Operating Systems. The project combines Linux administration, CPU scheduling simulation, and Docker-based service deployment.
+**Team:** Ahmed Cheikh and Varha Mohamed Mahmoud  
+**Course:** Introduction to Operating Systems - LIU 2026  
+**Theme:** Linux administration, CPU scheduling and Docker containerization
 
-## Project Objectives
+---
 
-The project is divided into three main technical parts:
+## 1. Project Overview
 
-1. **Shell Automation with Bash**
-   - Automate user creation.
-   - Prepare a secure workspace directory.
-   - Configure ownership and permissions.
-   - Simulate disk quota assignment.
+This repository contains the implementation of the **System Architect Lab** mini-project. The project combines three main technical components:
 
-2. **CPU Scheduling Modeling**
-   - Implement and compare Round Robin and SRTF scheduling algorithms.
-   - Generate Gantt chart traces.
-   - Calculate average waiting time.
+1. **Bash automation** for Linux system administration.
+2. **CPU scheduling simulation** comparing Round Robin and SRTF.
+3. **Docker infrastructure** using a custom Debian image, MySQL, Apache and automated CRUD operations.
 
-3. **Docker Infrastructure and Containerization**
-   - Deploy a Debian Linux lab container.
-   - Deploy a MySQL database container.
-   - Deploy an Apache HTTP server container.
-   - Use a persistent MySQL volume.
-   - Automate CRUD operations through a Bash script and SQL file.
+The latest version of the project executes both the Bash administration script and the Python scheduling simulator from inside the Docker-based Debian environment. This makes testing safer, more reproducible and closer to a real lab setup.
 
-## Repository Structure
+---
+
+## 2. Repository Structure
 
 ```text
 System-Architect-Lab/
-├── Docker/
-│   └── docker-compose.yml
+│
 ├── bash/
 │   └── admin_systeme.sh
+│
 ├── scheduling/
 │   └── scheduling.py
-├── scripts/
-│   └── run_crud.sh
+│
+├── docker/
+│   ├── docker-compose.yml
+│   └── Dockerfile.debian
+│
 ├── sql/
 │   └── crud.sql
+│
+├── scripts/
+│   └── run_crud.sh
+│
 ├── web/
 │   └── index.html
-└── README.md
+│
+├── README.md
+├── README_FR.md
+└── .gitignore
 ```
 
-## Requirements
+---
 
-Before running the project, make sure the following tools are installed and available:
+## 3. Components
 
-- Docker Desktop or Docker Engine
-- Docker Compose
-- Python 3
-- Bash shell
-- A terminal emulator
-- A web browser
+### 3.1 Bash Automation
 
-## 1. Bash Automation
-
-The Bash script is located at:
+The Bash script is located in:
 
 ```text
 bash/admin_systeme.sh
 ```
 
-### Make the script executable
+It automates the following tasks:
 
-```bash
-chmod +x bash/admin_systeme.sh
-```
+- Root privilege verification.
+- User account creation.
+- Workspace directory creation.
+- Ownership configuration with `chown`.
+- Permission configuration with `chmod 700`.
+- Disk quota simulation.
 
-### Run the script
+The script is tested inside the Debian container instead of directly on the host machine. This prevents accidental modification of the host system.
 
-```bash
-sudo ./bash/admin_systeme.sh
-```
+---
 
-The script must be executed with administrator privileges because user creation and permission management require root access.
+### 3.2 CPU Scheduling Simulation
 
-### Main operations
-
-The script performs the following actions:
-
-- Checks whether it is being executed as root.
-- Reads the username to create.
-- Verifies whether the user already exists.
-- Creates the user with a home directory.
-- Sets the user password.
-- Creates a workspace directory.
-- Applies ownership with `chown`.
-- Applies secure permissions with `chmod 700`.
-- Displays a summary of the configuration.
-
-## 2. CPU Scheduling Simulation
-
-The scheduling program is located at:
+The Python simulation is located in:
 
 ```text
 scheduling/scheduling.py
 ```
 
-### Run the program
+It implements and compares:
 
-```bash
-python3 scheduling/scheduling.py
-```
-
-### Implemented algorithms
-
-- **Round Robin** with a quantum of 2 time units.
-- **SRTF** (Shortest Remaining Time First).
-
-### Output
+- **Round Robin** with a fixed quantum.
+- **SRTF** - Shortest Remaining Time First.
 
 The program displays:
 
-- Gantt chart traces.
+- Gantt-style execution output.
 - Waiting time for each process.
 - Turnaround time for each process.
-- Average waiting time.
-- Analytical comparison between Round Robin and SRTF.
+- Average waiting time comparison.
 
-## 3. Docker Infrastructure
+The script is executed inside the custom Debian Docker container, where Python is already installed.
 
-The Docker Compose file is located at:
+---
 
-```text
-Docker/docker-compose.yml
-```
+### 3.3 Docker Infrastructure
 
-### Start the infrastructure
+The Docker environment contains three services:
 
-From the `Docker/` directory, run:
+| Service | Role |
+|---|---|
+| `debian_lab` | Custom Debian lab environment for Bash and Python testing |
+| `mysql_server` | MySQL database service for the `etudiants` database |
+| `apache_server` | Apache HTTP server serving a custom web page |
 
-```bash
-cd Docker
-docker compose up -d
-```
-
-If your system uses the older Compose command, use:
-
-```bash
-docker-compose up -d
-```
-
-### Stop the infrastructure
-
-```bash
-docker compose down
-```
-
-To remove orphan containers as well:
-
-```bash
-docker compose down --remove-orphans
-```
-
-Do not use `docker compose down -v` unless you intentionally want to delete the MySQL volume and reset the database data.
-
-## Docker Services
-
-The stack contains three services:
-
-| Service | Image | Role | Port / Storage |
-|---|---|---|---|
-| `debian_lab` | `debian:stable-slim` | Linux testing environment | Interactive terminal |
-| `mysql_server` | `mysql:8.0` | MySQL database | `3307:3306` + `mysql_data` volume |
-| `apache_server` | `httpd:latest` | Apache HTTP server | `8080:80` + `web` bind mount |
-
-## Apache HTTP Server
-
-The Apache server is available from the host machine at:
+The infrastructure is defined in:
 
 ```text
-http://localhost:8080
+docker/docker-compose.yml
 ```
 
-The custom web page is located at:
+The custom Debian image is defined in:
 
 ```text
-web/index.html
+docker/Dockerfile.debian
 ```
 
-It is mounted into the Apache container using:
+---
+
+## 4. Custom Debian Image
+
+The project uses a custom Debian image to avoid installing tools manually after every container recreation.
+
+The Dockerfile installs:
+
+- `python3`
+- `passwd`
+- `procps`
+- `iproute2`
+- `iputils-ping`
+- `nano`
+
+This allows the Debian container to run:
+
+- The Bash administration script.
+- The Python scheduling simulation.
+- Basic Linux diagnostic commands.
+
+Relevant Compose section:
 
 ```yaml
-volumes:
-  - ../web:/usr/local/apache2/htdocs
+debian_lab:
+  build:
+    context: .
+    dockerfile: Dockerfile.debian
+  image: system-architect-debian:1.0
+  container_name: debian_lab
+  tty: true
+  stdin_open: true
+  volumes:
+    - ../bash:/lab/bash
+    - ../scheduling:/lab/scheduling
 ```
 
-This means that the local `web/` folder replaces Apache's default website directory inside the container.
+---
 
-## MySQL Database
+## 5. Starting the Infrastructure
 
-The MySQL container creates a database named:
-
-```text
-etudiants
-```
-
-The root password used in the project is:
-
-```text
-root123
-```
-
-The host port is `3307` because port `3306` may already be used by a local MySQL service.
-
-### Connect to MySQL from inside the container
+From the project root:
 
 ```bash
-docker exec -it mysql_server mysql -u root -p
+cd docker
 ```
 
-Password:
-
-```text
-root123
-```
-
-### Connect to MySQL from the host machine
+Build and start the services:
 
 ```bash
-mysql -h 127.0.0.1 -P 3307 -u root -p
+docker compose up -d --build
 ```
 
-Password:
-
-```text
-root123
-```
-
-## Persistent MySQL Volume
-
-The MySQL service uses the following named volume:
-
-```yaml
-volumes:
-  - mysql_data:/var/lib/mysql
-```
-
-The `/var/lib/mysql` directory is where MySQL stores its physical database files. By mounting a persistent Docker volume there, the database state is separated from the lifecycle of the container.
-
-This means:
-
-- The container can be stopped and recreated.
-- The MySQL data can remain available.
-- The database is not lost unless the volume is explicitly deleted.
-
-To list Docker volumes:
+Check the running containers:
 
 ```bash
-docker volume ls
+docker compose ps
 ```
 
-## Automated CRUD Operations
+Expected services:
 
-The CRUD SQL file is located at:
+```text
+debian_lab
+mysql_server
+apache_server
+```
+
+---
+
+## 6. Testing the Debian Lab Container
+
+Enter the Debian container:
+
+```bash
+docker exec -it debian_lab bash
+```
+
+Verify Python is installed:
+
+```bash
+python3 --version
+```
+
+Check the mounted project folders:
+
+```bash
+ls -la /lab/bash
+ls -la /lab/scheduling
+```
+
+Exit the container:
+
+```bash
+exit
+```
+
+---
+
+## 7. Running the Bash Automation Script inside Docker
+
+Enter the Debian container:
+
+```bash
+docker exec -it debian_lab bash
+```
+
+Run the script:
+
+```bash
+bash /lab/bash/admin_systeme.sh
+```
+
+Example test username:
+
+```text
+testuser
+```
+
+Verify the created user:
+
+```bash
+id testuser
+```
+
+Verify the workspace permissions:
+
+```bash
+ls -ld /home/testuser/workspace
+```
+
+Expected permission style:
+
+```text
+drwx------
+```
+
+Exit the container:
+
+```bash
+exit
+```
+
+---
+
+## 8. Running the Python Scheduling Simulation inside Docker
+
+Enter the Debian container:
+
+```bash
+docker exec -it debian_lab bash
+```
+
+Run the scheduling program:
+
+```bash
+python3 /lab/scheduling/scheduling.py
+```
+
+Exit:
+
+```bash
+exit
+```
+
+---
+
+## 9. MySQL CRUD Automation
+
+The SQL CRUD file is located in:
 
 ```text
 sql/crud.sql
 ```
 
-The automation script is located at:
+The automation script is located in:
 
 ```text
 scripts/run_crud.sh
 ```
-
-### Make the CRUD script executable
-
-```bash
-chmod +x scripts/run_crud.sh
-```
-
-### Run the CRUD automation
 
 From the project root, run:
 
@@ -280,101 +304,127 @@ From the project root, run:
 ./scripts/run_crud.sh
 ```
 
-The script checks whether the `mysql_server` container is running, then executes the SQL file inside the MySQL container.
+The script executes the SQL file inside the MySQL container and performs:
 
-### CRUD operations included
+- Table creation.
+- Data insertion.
+- Data reading.
+- Data update.
+- Data deletion.
+- Final read verification.
 
-| Operation | SQL Example | Purpose |
-|---|---|---|
-| Create | `INSERT INTO etudiants ...` | Add student records |
-| Read | `SELECT * FROM etudiants;` | Display records |
-| Update | `UPDATE etudiants SET ...` | Modify a record |
-| Delete | `DELETE FROM etudiants WHERE ...` | Delete a record |
+---
 
-## Useful Docker Commands
+## 10. MySQL Port and Persistent Volume
 
-### Check running containers
+The MySQL container uses this port mapping:
 
-```bash
-docker compose ps
+```yaml
+ports:
+  - "3307:3306"
 ```
 
-### View all containers
+This means:
 
-```bash
-docker ps -a
+```text
+Host port 3307 -> Container port 3306
 ```
 
-### View Apache logs
+Port `3307` is used to avoid conflict with a local MySQL service running on port `3306`.
 
-```bash
-docker logs apache_server
+The MySQL service also uses a persistent Docker volume:
+
+```yaml
+volumes:
+  - mysql_data:/var/lib/mysql
 ```
 
-### Enter the Debian container
+This keeps database files outside the temporary lifecycle of the container. Running `docker compose down` stops and removes containers but keeps the volume. Running `docker compose down -v` removes the volume and should be used only when intentionally resetting the database.
 
-```bash
-docker exec -it debian_lab bash
+---
+
+## 11. Apache HTTP Server
+
+The Apache service exposes container port `80` on host port `8080`:
+
+```yaml
+ports:
+  - "8080:80"
 ```
 
-Exit with:
+The custom web page is stored in:
 
-```bash
-exit
+```text
+web/index.html
 ```
 
-### Enter the Apache container
+It is mounted into Apache using:
 
-```bash
-docker exec -it apache_server bash
+```yaml
+volumes:
+  - ../web:/usr/local/apache2/htdocs
 ```
 
-If Bash is not available:
+Open the service in a browser:
 
-```bash
-docker exec -it apache_server sh
+```text
+http://localhost:8080
 ```
 
-## Validation Checklist
+---
 
-Before submitting or recording the demonstration video, verify the following:
+## 12. Stopping the Infrastructure
 
-- `docker compose ps` shows all three containers as `Up`.
-- `http://localhost:8080` shows the custom Apache page.
-- `docker exec -it mysql_server mysql -u root -p` connects successfully.
-- `./scripts/run_crud.sh` runs without errors.
-- `docker volume ls` shows the MySQL volume.
-- `python3 scheduling/scheduling.py` displays Gantt charts and average waiting times.
-- `sudo ./bash/admin_systeme.sh` performs the expected Linux administration tasks.
+From the `docker/` folder:
 
-## Suggested Demonstration Flow
+```bash
+docker compose down
+```
 
-A 3-minute demonstration video can follow this order:
+To remove containers and volumes, use only if a full reset is required:
 
-1. Show the project directory structure.
-2. Show the `docker-compose.yml` file.
-3. Start the stack with `docker compose up -d`.
-4. Verify services with `docker compose ps`.
-5. Open `http://localhost:8080` and show the Apache page.
-6. Run `./scripts/run_crud.sh` and show the SQL output.
-7. Open the MySQL container and show the `etudiants` database.
-8. Briefly explain the persistent MySQL volume.
-9. Run the scheduling Python script.
-10. Mention the Bash administration script.
+```bash
+docker compose down -v
+```
 
-## Notes
+---
 
-- If port `3306` is already used by local MySQL, keep the Docker mapping as `3307:3306`.
-- If Apache does not show the custom page, verify the bind mount path `../web:/usr/local/apache2/htdocs`.
-- If Docker Compose warns about orphan containers, run `docker compose down --remove-orphans`.
-- If Docker cannot connect to the daemon, ensure Docker Desktop or Docker Engine is running.
+## 13. Git Workflow
 
-## Author
+After modifying files, push updates with:
 
-Ahmed Cheikh
+```bash
+git status
+git add .
+git commit -m "Update project files"
+git push
+```
 
-## Academic Context
+If the remote repository has changes that are not local, use:
 
-Mini-Project: **System Architect Lab**  
-Course: **Introduction to Operating Systems**  
-Year: **LIU 2026**
+```bash
+git pull --rebase origin main
+git push
+```
+
+---
+
+## 14. Demonstration Checklist
+
+A complete demonstration should show:
+
+1. Repository structure.
+2. Docker Compose build and startup.
+3. Running containers with `docker compose ps`.
+4. Bash script execution inside `debian_lab`.
+5. Python scheduling execution inside `debian_lab`.
+6. Apache page at `http://localhost:8080`.
+7. CRUD automation using `./scripts/run_crud.sh`.
+8. Explanation of the persistent MySQL volume.
+
+---
+
+## 15. Team
+
+- Ahmed Cheikh
+- Varha Mohamed Mahmoud
