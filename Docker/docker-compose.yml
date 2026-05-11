@@ -1,12 +1,16 @@
 services:
 
   debian_lab:
-    image: debian:stable-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.debian
+    image: system-architect-debian:1.0
     container_name: debian_lab
     tty: true
     stdin_open: true
     volumes:
-      - ../Bash:/lab/bash
+      - ../bash:/lab/bash
+      - ../scheduling:/lab/scheduling
 
   mysql_server:
     image: mysql:8.0

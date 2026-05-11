@@ -1,0 +1,16 @@
+FROM debian:stable-slim
+
+LABEL description="Custom Debian lab image for System Architect Lab project"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    passwd \
+    procps \
+    iproute2 \
+    iputils-ping \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /lab
+
+CMD ["bash"]
