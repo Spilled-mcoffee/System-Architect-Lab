@@ -29,7 +29,7 @@ System-Architect-Lab/
 ├── scheduling/
 │   └── scheduling.py
 │
-├── docker/
+├── Docker/
 │   ├── docker-compose.yml
 │   └── Dockerfile.debian
 │
