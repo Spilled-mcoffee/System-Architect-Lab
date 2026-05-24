@@ -16,6 +16,11 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Optional: exclude final report files from Git
-*.pdf
-*.docx
+# LibreOffice / office temporary lock files
+.~lock.*
+
+# Do NOT ignore reports or videos.
+# The following are intentionally allowed:
+# *.pdf
+# *.docx
+# *.mp4
